@@ -4,7 +4,7 @@ In this branch I will try to do it in another fassion and different libs (like p
 
 1 update the incoming data：use the depth and rgb data from cirtain path
 
-2 (optional)generate point cloud & generate mesh ：do back projection from depth data and generate mesh able TSDF, whcih is a standard format for voxel-grid integration
+2 (optional)generate point cloud & generate mesh ：do back projection from depth data a sparse point-cloud and therefore generate sparse TSDF, whcih is a standard format for voxel-grid integration.
 
 3 pose estimation in real time(or read from file): it is treaky that in some cases the pose transition can be read from sensors like IMU but it-
   can also be calculated in realtime by doing ICP precess everytime between two consecutive depth pic. 
