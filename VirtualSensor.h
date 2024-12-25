@@ -9,6 +9,11 @@
 #include "FreeImageHelper.h"
 #include "camera.h" //preserve all hardware restrictions
 
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include "ICP.h" 
+
+
 typedef unsigned char BYTE;
 
 // reads sensor files according to https://vision.in.tum.de/data/datasets/rgbd-dataset/file_formats
@@ -25,20 +30,19 @@ public:
 	{
 		SAFE_DELETE_ARRAY(m_depthFrame);
 		SAFE_DELETE_ARRAY(m_colorFrame);
+		m_prevCloud.reset(); // claen the cloud
 	}
 
 	bool Init(const std::string& datasetDir)
 	{
-		m_baseDir = datasetDir;
-
+		m_baseDir = datasetDir; // store path 
 		// read filename lists
 		if (!ReadFileList(datasetDir + "depth.txt", m_filenameDepthImages, m_depthImagesTimeStamps)) return false;
 		if (!ReadFileList(datasetDir + "rgb.txt", m_filenameColorImages, m_colorImagesTimeStamps)) return false;
-
-		// read tracking
-		if (!ReadTrajectoryFile(datasetDir + "groundtruth.txt", m_trajectory, m_trajectoryTimeStamps)) return false;
-
 		if (m_filenameDepthImages.size() != m_filenameColorImages.size()) return false;
+		
+		// calculate the poes estimation into "transformation"
+		m_prevCloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>());
 
 		// image resolutions
 		m_colorImageWidth = 640;
