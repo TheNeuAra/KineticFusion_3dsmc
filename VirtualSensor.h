@@ -12,6 +12,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include "ICP.h" 
+#include "converter.h" 
 
 
 typedef unsigned char BYTE;
@@ -79,7 +80,7 @@ public:
 		if ((unsigned int)m_currentIdx >= (unsigned int)m_filenameColorImages.size()) return false;
 
 		std::cout << "ProcessNextFrame [" << m_currentIdx << " | " << m_filenameColorImages.size() << "]" << std::endl;
-
+		//--------------------------
 		FreeImageB rgbImage;
 		rgbImage.LoadImageFromFile(m_baseDir + m_filenameColorImages[m_currentIdx]);
 		memcpy(m_colorFrame, rgbImage.data, 4 * 640 * 480);
@@ -95,24 +96,24 @@ public:
 			else
 				m_depthFrame[i] = dImage.data[i] * 1.0f / 5000.0f;
 		}
+		//--------------------------
+	        // convert m_depthFrame into point cloud
+       		 pcl::PointCloud<pcl::PointXYZ>::Ptr currentCloud = converter::ConvertDepthToPointCloud(
+           			 m_depthFrame, m_depthImageWidth, m_depthImageHeight, m_depthIntrinsics);
 
-		// find transformation (simple nearest neighbor, linear search)
-		double timestamp = m_depthImagesTimeStamps[m_currentIdx];
-		double min = std::numeric_limits<double>::max();
-		int idx = 0;
-		for (unsigned int i = 0; i < m_trajectory.size(); ++i)
-		{
-			double d = fabs(m_trajectoryTimeStamps[i] - timestamp);
-			if (min > d)
-			{
-				min = d;
-				idx = i;
-			}
-		}
-		m_currentTrajectory = m_trajectory[idx];
+        	// use ICP to calculate poes transition in real time
+        	if (m_prevCloud->size() > 0) { // check if there is any previous cloud if so then calculate the relative pose transition otherweise set it into indentity
+          	   Eigen::Matrix4f transformation;
+           		 if (!ICP::CalculatePose(m_prevCloud, currentCloud, m_currentTrajectory)) {
+              		  std::cerr << "Failed to calculate pose!" << std::endl;
+               	 	  return false;
+           	 	}
+        	} else {
+           	 m_currentTrajectory.setIdentity(); //still use the original var name  "m_currentTrajectory"
+        	}
 
-
-		return true;
+        	m_prevCloud = currentCloud; // update the member "m_prevCloud"
+        	return true;
 	}
 
 	unsigned int GetCurrentFrameCnt()
@@ -274,6 +275,6 @@ private:
 	std::vector<double> m_colorImagesTimeStamps;
 
 	// trajectory
-	std::vector<Eigen::Matrix4f> m_trajectory;
-	std::vector<double> m_trajectoryTimeStamps;
+    	pcl::PointCloud<pcl::PointXYZ>::Ptr m_prevCloud; // new var: "m_prevCloud" for storing an intermidiate var for ICP calculation
+	Eigen::Matrix4f m_currentTrajectory;
 };
