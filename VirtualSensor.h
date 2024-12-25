@@ -7,6 +7,7 @@
 
 #include "Eigen.h"
 #include "FreeImageHelper.h"
+#include "camera.h" //preserve all hardware restrictions
 
 typedef unsigned char BYTE;
 
