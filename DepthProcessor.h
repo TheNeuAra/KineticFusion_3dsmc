@@ -1,7 +1,4 @@
 #pragma once
-
-#include "VirtualSensor.h"
-#include <opencv2/opencv.hpp>
 #include <vector>
 
 class DepthProcessor {
