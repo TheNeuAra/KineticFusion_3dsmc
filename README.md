@@ -1,5 +1,7 @@
 In branch main the code is basiclly implemented by Open3D and OpenCV 
+
 In this branch I will try to do it in another fassion and different libs (like pcl and pnglib etc) but the core ideal is the same: 
+
 1 update the incoming data：use the depth and rgb data from cirtain path
 2 (optional)generate point cloud & generate mesh ：do back projection from depth data and generate mesh able TSDF, whcih is a standard format for voxel-grid integration
 3 pose estimation in real time(or read from file): it is treaky that in some cases the pose transition can be read from sensors like IMU but it-
