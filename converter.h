@@ -12,6 +12,19 @@
 
 namespace converter {
 
+// 
+    static pcl::PointCloud<pcl::PointXYZ>::Ptr filterPointCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, float leaf_size ) {
+        // vocel grid filter to sparse the points and reduce to cal time possible
+        pcl::VoxelGrid<pcl::PointXYZ> voxel_filter;
+        pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+        voxel_filter.setInputCloud(cloud);
+        voxel_filter.setLeafSize(leaf_size, leaf_size, leaf_size);
+        voxel_filter.filter(*filtered_cloud);
+
+        return filtered_cloud;
+    }
+
+
 pcl::PointCloud<pcl::PointXYZ>::Ptr VirtualSensor::ConvertDepthToPointCloud(float* depthMap, unsigned int width, unsigned int height, 
                                                                             const Eigen::Matrix3f& intrinsics) {
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>());
@@ -32,18 +45,8 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr VirtualSensor::ConvertDepthToPointCloud(floa
     cloud->width = cloud->points.size();
     cloud->height = 1; // 单行点云
     cloud->is_dense = false;
-    return cloud;
-}
+     return filterPointCloud(cloud, 0.01f);
+  }
 
- // 对点云进行滤波处理
-    static pcl::PointCloud<pcl::PointXYZ>::Ptr filterPointCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, float leaf_size = 0.01f) {
-        // 1. 体素滤波
-        pcl::VoxelGrid<pcl::PointXYZ> voxel_filter;
-        pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_cloud(new pcl::PointCloud<pcl::PointXYZ>);
-        voxel_filter.setInputCloud(cloud);
-        voxel_filter.setLeafSize(leaf_size, leaf_size, leaf_size);
-        voxel_filter.filter(*filtered_cloud);
-
-        return filtered_cloud;
-    }
+ 
 }// end of name space converter
