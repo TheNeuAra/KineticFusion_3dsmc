@@ -1,6 +1,6 @@
 
 #include "VirtualSensor.h"
-
+#include "TSDF.h"
 
 int main() {
   // Initialize VirtualSensor to load RGB and depth data
@@ -10,7 +10,12 @@ int main() {
     return -1;
   }
 
-  // Initialize the TSDF volume for 3D reconstruction
+  /*
+    for now,  {image acuisition: -load , -read,  -filter, -convert,  -icp,  -get poes esti} are done. and all 
+    of them are encapsulated inside VirtualSensor.h. In THIS MAIN, I plan to do the tsdf, but I plan to do it also in a same fassion, which is 
+    done by giving more name space  like "TSDF::" and it will be insatancialized in main to mesh and integrate but first I probably have to have a getter
+    func in side virtualsensor.h eg. "getMyCurrCloud()" and then at main do some further job
+  */
 
   while (sensor.ProcessNextFrame()) {
 
