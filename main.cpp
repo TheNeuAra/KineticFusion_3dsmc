@@ -1,6 +1,5 @@
-#include ""
+
 #include "VirtualSensor.h"
-#include "pcl.h"
 
 
 int main() {
