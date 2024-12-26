@@ -43,8 +43,8 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr VirtualSensor::ConvertDepthToPointCloud(floa
         }
     }
     cloud->width = cloud->points.size();
-    cloud->height = 1; // 单行点云
-    cloud->is_dense = false;
+    cloud->height = 1; // cloud is just an arry of points so it has only 1 dim
+    cloud->is_dense = false; // if all invalid point have been removed then i can use dense = true and everything will run faster in pcl
      return filterPointCloud(cloud, 0.01f);
   }
 
