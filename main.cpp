@@ -2,6 +2,8 @@
 #include "VirtualSensor.h"
 #include "TSDF.h"
 
+using namespace TSDFNamespace;
+
 int main() {
   // Initialize VirtualSensor to load RGB and depth data
   VirtualSensor sensor;
@@ -17,8 +19,18 @@ int main() {
     func in side virtualsensor.h eg. "getMyCurrCloud()" and then at main do some further job
   */
 
-  while (sensor.ProcessNextFrame()) {
+  TSDFParameters params = {0.005f, 0.04f, Eigen::Vector3i(128, 128, 128)};
+  auto tsdf_volume = InitializeTSDF(params);
 
+  
+  while (sensor.ProcessNextFrame()) {
+    // integrate the mesh to TSDF
+    IntegrateTSDF(tsdf_volume, params, cloud, pose);
+
+    // extract my surfaces
+    auto mesh = ExtractMeshFromTSDF(tsdf_volume, params);
+    
+    SaveMesh(mesh, "output_mesh.ply");
   }
   return 0;
 }
