@@ -104,7 +104,7 @@ public:
         	// use ICP to calculate poes transition in real time
         	if (m_prevCloud->size() > 0) { // check if there is any previous cloud if so then calculate the relative pose transition otherweise set it into indentity
           	   Eigen::Matrix4f transformation;
-           		 if (!ICP::CalculatePose(m_prevCloud, currentCloud, m_currentTrajectory)) {
+           		 if (!ICP::CalculatePose(m_prevCloud, currentCloud, m_currentTrajectory, transformation)) {
               		  std::cerr << "Failed to calculate pose!" << std::endl;
                	 	  return false;
            	 	}
